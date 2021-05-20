@@ -546,7 +546,8 @@ void drawDepthUI(){
 }
 
 void drawTimerUI(){
-  String timeString = str(gameTimer); // Requirement #4: Get the mm:ss string using String convertFramesToTimeString(int frames)
+  String timeString = convertFramesToTimeString(gameTimer);
+  // String timeString = str(gameTimer); // Requirement #4: Get the mm:ss string using String convertFramesToTimeString(int frames)
 
   textAlign(LEFT, BOTTOM);
 
@@ -561,7 +562,7 @@ void drawTimerUI(){
 }
 
 void addTime(float seconds){  // Requirement #2
-  gameTimer += CLOCK_BONUS_SECONDS*4*15;
+  gameTimer += seconds * 4 * 15;
   
 }
 
@@ -573,7 +574,13 @@ boolean isHit(float ax, float ay, float aw, float ah, float bx, float by, float 
 }
 
 String convertFramesToTimeString(int frames){  // Requirement #4
-  return "";
+  int seconds = floor(frames/60);
+  int m = floor(seconds/60);
+  int s = seconds - 60*m;
+  String min = nf(m,2);
+  String sec = nf(s,2);
+  
+  return min + ":" + sec;
 }
 
 color getTimeTextColor(int frames){        // Requirement #5
