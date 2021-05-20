@@ -44,569 +44,606 @@ int playerMoveDuration = 15;
 boolean demoMode = false;
 
 void setup() {
-	size(640, 480, P2D);
-	frameRate(60);
-	bg = loadImage("img/bg.jpg");
-	title = loadImage("img/title.jpg");
-	gameover = loadImage("img/gameover.jpg");
-	gamewin = loadImage("img/gamewin.jpg");
-	startNormal = loadImage("img/startNormal.png");
-	startHovered = loadImage("img/startHovered.png");
-	restartNormal = loadImage("img/restartNormal.png");
-	restartHovered = loadImage("img/restartHovered.png");
-	groundhogIdle = loadImage("img/groundhogIdle.png");
-	groundhogLeft = loadImage("img/groundhogLeft.png");
-	groundhogRight = loadImage("img/groundhogRight.png");
-	groundhogDown = loadImage("img/groundhogDown.png");
-	life = loadImage("img/life.png");
-	soldier = loadImage("img/soldier.png");
-	cabbage = loadImage("img/cabbage.png");
-	clock = loadImage("img/clock.png");
-	caution = loadImage("img/caution.png");
-	sweethome = loadImage("img/sweethome.png");
-	soilEmpty = loadImage("img/soils/soilEmpty.png");
+  size(640, 480, P2D);
+  frameRate(60);
+  bg = loadImage("img/bg.jpg");
+  title = loadImage("img/title.jpg");
+  gameover = loadImage("img/gameover.jpg");
+  gamewin = loadImage("img/gamewin.jpg");
+  startNormal = loadImage("img/startNormal.png");
+  startHovered = loadImage("img/startHovered.png");
+  restartNormal = loadImage("img/restartNormal.png");
+  restartHovered = loadImage("img/restartHovered.png");
+  groundhogIdle = loadImage("img/groundhogIdle.png");
+  groundhogLeft = loadImage("img/groundhogLeft.png");
+  groundhogRight = loadImage("img/groundhogRight.png");
+  groundhogDown = loadImage("img/groundhogDown.png");
+  life = loadImage("img/life.png");
+  soldier = loadImage("img/soldier.png");
+  cabbage = loadImage("img/cabbage.png");
+  clock = loadImage("img/clock.png");
+  caution = loadImage("img/caution.png");
+  sweethome = loadImage("img/sweethome.png");
+  soilEmpty = loadImage("img/soils/soilEmpty.png");
 
-	font = createFont("font/font.ttf", 56);
-	textFont(font);
+  font = createFont("font/font.ttf", 56);
+  textFont(font);
 
-	// Load PImage[][] soils
-	soils = new PImage[6][5];
-	for(int i = 0; i < soils.length; i++){
-		for(int j = 0; j < soils[i].length; j++){
-			soils[i][j] = loadImage("img/soils/soil" + i + "/soil" + i + "_" + j + ".png");
-		}
-	}
+  // Load PImage[][] soils
+  soils = new PImage[6][5];
+  for(int i = 0; i < soils.length; i++){
+    for(int j = 0; j < soils[i].length; j++){
+      soils[i][j] = loadImage("img/soils/soil" + i + "/soil" + i + "_" + j + ".png");
+    }
+  }
 
-	// Load PImage[][] stones
-	stones = new PImage[2][5];
-	for(int i = 0; i < stones.length; i++){
-		for(int j = 0; j < stones[i].length; j++){
-			stones[i][j] = loadImage("img/stones/stone" + i + "/stone" + i + "_" + j + ".png");
-		}
-	}
+  // Load PImage[][] stones
+  stones = new PImage[2][5];
+  for(int i = 0; i < stones.length; i++){
+    for(int j = 0; j < stones[i].length; j++){
+      stones[i][j] = loadImage("img/stones/stone" + i + "/stone" + i + "_" + j + ".png");
+    }
+  }
 
-	initGame();
+  initGame();
 }
 
 void initGame(){
 
-	// Initialize gameTimer
-	gameTimer = GAME_INIT_TIMER;
+  // Initialize gameTimer
+  gameTimer = GAME_INIT_TIMER;
 
-	// Initialize player
-	initPlayer();
+  // Initialize player
+  initPlayer();
 
-	// Initialize soilHealth
-	initSoils();
+  // Initialize soilHealth
+  initSoils();
 
-	// Initialize soidiers and their position
-	initSoldiers();
+  // Initialize soidiers and their position
+  initSoldiers();
 
-	// Initialize cabbages and their position
-	initCabbages();
+  // Initialize cabbages and their position
+  initCabbages();
 
-	// Requirement #2: Initialize clocks and their position
-
+  // Requirement #2: Initialize clocks and their position
+  initClocks();
 }
 
 void initPlayer(){
-	playerX = PLAYER_INIT_X;
-	playerY = PLAYER_INIT_Y;
-	playerCol = (int) playerX / SOIL_SIZE;
-	playerRow = (int) playerY / SOIL_SIZE;
-	playerMoveTimer = 0;
-	playerHealth = 2;
+  playerX = PLAYER_INIT_X;
+  playerY = PLAYER_INIT_Y;
+  playerCol = (int) playerX / SOIL_SIZE;
+  playerRow = (int) playerY / SOIL_SIZE;
+  playerMoveTimer = 0;
+  playerHealth = 2;
 }
 
 void initSoils(){
-	soilHealth = new int[SOIL_COL_COUNT][SOIL_ROW_COUNT];
+  soilHealth = new int[SOIL_COL_COUNT][SOIL_ROW_COUNT];
 
-	int[] emptyGridCount = new int[SOIL_ROW_COUNT];
+  int[] emptyGridCount = new int[SOIL_ROW_COUNT];
 
-	for(int j = 0; j < SOIL_ROW_COUNT; j++){
-		emptyGridCount[j] = ( j == 0 ) ? 0 : floor(random(1, 3));
-	}
+  for(int j = 0; j < SOIL_ROW_COUNT; j++){
+    emptyGridCount[j] = ( j == 0 ) ? 0 : floor(random(1, 3));
+  }
 
-	for(int i = 0; i < soilHealth.length; i++){
-		for (int j = 0; j < soilHealth[i].length; j++) {
-			 // 0: no soil, 15: soil only, 30: 1 stone, 45: 2 stones
-			float randRes = random(SOIL_COL_COUNT - i);
+  for(int i = 0; i < soilHealth.length; i++){
+    for (int j = 0; j < soilHealth[i].length; j++) {
+       // 0: no soil, 15: soil only, 30: 1 stone, 45: 2 stones
+      float randRes = random(SOIL_COL_COUNT - i);
 
-			if(randRes < emptyGridCount[j]){
+      if(randRes < emptyGridCount[j]){
 
-				soilHealth[i][j] = 0;
-				emptyGridCount[j] --;
+        soilHealth[i][j] = 0;
+        emptyGridCount[j] --;
 
-			}else{
+      }else{
 
-				soilHealth[i][j] = 15;
+        soilHealth[i][j] = 15;
 
-				if(j < 8){
+        if(j < 8){
 
-					if(j == i) soilHealth[i][j] = 2 * 15;
+          if(j == i) soilHealth[i][j] = 2 * 15;
 
-				}else if(j < 16){
+        }else if(j < 16){
 
-					int offsetJ = j - 8;
-					if(offsetJ == 0 || offsetJ == 3 || offsetJ == 4 || offsetJ == 7){
-						if(i == 1 || i == 2 || i == 5 || i == 6){
-							soilHealth[i][j] = 2 * 15;
-						}
-					}else{
-						if(i == 0 || i == 3 || i == 4 || i == 7){
-							soilHealth[i][j] = 2 * 15;
-						}
-					}
+          int offsetJ = j - 8;
+          if(offsetJ == 0 || offsetJ == 3 || offsetJ == 4 || offsetJ == 7){
+            if(i == 1 || i == 2 || i == 5 || i == 6){
+              soilHealth[i][j] = 2 * 15;
+            }
+          }else{
+            if(i == 0 || i == 3 || i == 4 || i == 7){
+              soilHealth[i][j] = 2 * 15;
+            }
+          }
 
-				}else{
+        }else{
 
-					int offsetJ = j - 16;
-					int stoneCount = (offsetJ + i) % 3;
-					soilHealth[i][j] = (stoneCount + 1) * 15;
+          int offsetJ = j - 16;
+          int stoneCount = (offsetJ + i) % 3;
+          soilHealth[i][j] = (stoneCount + 1) * 15;
 
-				}
-			}
-		}
-	}
+        }
+      }
+    }
+  }
 }
 
 void initSoldiers(){
-	soldierX = new float[6];
-	soldierY = new float[6];
+  soldierX = new float[6];
+  soldierY = new float[6];
 
-	for(int i = 0; i < soldierX.length; i++){
-		soldierX[i] = random(-SOIL_SIZE, width);
-		soldierY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
-	}
+  for(int i = 0; i < soldierX.length; i++){
+    soldierX[i] = random(-SOIL_SIZE, width);
+    soldierY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
+  }
 }
 
 void initCabbages(){
-	cabbageX = new float[6];
-	cabbageY = new float[6];
+  cabbageX = new float[6];
+  cabbageY = new float[6];
 
-	for(int i = 0; i < cabbageX.length; i++){
-		cabbageX[i] = SOIL_SIZE * floor(random(SOIL_COL_COUNT));
-		cabbageY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
-	}
+  for(int i = 0; i < cabbageX.length; i++){
+    cabbageX[i] = SOIL_SIZE * floor(random(SOIL_COL_COUNT));
+    cabbageY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
+  }
 }
 
 void initClocks(){
-	// Requirement #1: Complete this method based on initCabbages()
-	// - Remember to reroll if the randomized position has a cabbage on the same soil!
+  // Requirement #1: Complete this method based on initCabbages()
+  // - Remember to reroll if the randomized position has a cabbage on the same soil!
+  clockX = new float[6];
+  clockY = new float[6];
+  
+  for(int i = 0; i < clockX.length; i++){
+    do{
+      clockX[i] = SOIL_SIZE * floor(random(SOIL_COL_COUNT));
+      clockY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
+    }while(isExist(clockX[i], cabbageX[i]) || isExist(clockY[i], cabbageY[i]));
+      
+  }
+}
+
+boolean isExist(float positionA, float positionB){
+  if (positionA == positionB){
+    return true;
+  }
+  return false;
 }
 
 void draw() {
 
-	switch (gameState) {
+  switch (gameState) {
 
-		case GAME_START: // Start Screen
-		image(title, 0, 0);
-		if(START_BUTTON_X + START_BUTTON_WIDTH > mouseX
-	    && START_BUTTON_X < mouseX
-	    && START_BUTTON_Y + START_BUTTON_HEIGHT > mouseY
-	    && START_BUTTON_Y < mouseY) {
+    case GAME_START: // Start Screen
+    image(title, 0, 0);
+    if(START_BUTTON_X + START_BUTTON_WIDTH > mouseX
+      && START_BUTTON_X < mouseX
+      && START_BUTTON_Y + START_BUTTON_HEIGHT > mouseY
+      && START_BUTTON_Y < mouseY) {
 
-			image(startHovered, START_BUTTON_X, START_BUTTON_Y);
-			if(mousePressed){
-				gameState = GAME_RUN;
-				mousePressed = false;
-			}
+      image(startHovered, START_BUTTON_X, START_BUTTON_Y);
+      if(mousePressed){
+        gameState = GAME_RUN;
+        mousePressed = false;
+      }
 
-		}else{
+    }else{
 
-			image(startNormal, START_BUTTON_X, START_BUTTON_Y);
+      image(startNormal, START_BUTTON_X, START_BUTTON_Y);
 
-		}
+    }
 
-		break;
+    break;
 
-		case GAME_RUN: // In-Game
-		// Background
-		image(bg, 0, 0);
+    case GAME_RUN: // In-Game
+    // Background
+    image(bg, 0, 0);
 
-		// Sun
-	    stroke(255,255,0);
-	    strokeWeight(5);
-	    fill(253,184,19);
-	    ellipse(590,50,120,120);
+    // Sun
+      stroke(255,255,0);
+      strokeWeight(5);
+      fill(253,184,19);
+      ellipse(590,50,120,120);
 
-	    // CAREFUL!
-	    // Because of how this translate value is calculated, the Y value of the ground level is actually 0
-		pushMatrix();
-		translate(0, max(SOIL_SIZE * -22, SOIL_SIZE * 1 - playerY));
+      // CAREFUL!
+      // Because of how this translate value is calculated, the Y value of the ground level is actually 0
+    pushMatrix();
+    translate(0, max(SOIL_SIZE * -22, SOIL_SIZE * 1 - playerY));
 
-		// Ground
+    // Ground
 
-		fill(124, 204, 25);
-		noStroke();
-		rect(0, -GRASS_HEIGHT, width, GRASS_HEIGHT);
+    fill(124, 204, 25);
+    noStroke();
+    rect(0, -GRASS_HEIGHT, width, GRASS_HEIGHT);
 
-		// Soil
+    // Soil
 
-		for(int i = 0; i < SOIL_COL_COUNT; i++){
-			for(int j = 0; j < SOIL_ROW_COUNT; j++){
+    for(int i = 0; i < SOIL_COL_COUNT; i++){
+      for(int j = 0; j < SOIL_ROW_COUNT; j++){
 
-				if(soilHealth[i][j] > 0){
+        if(soilHealth[i][j] > 0){
 
-					int soilColor = (int) (j / 4);
-					int soilAlpha = (int) (min(5, ceil((float)soilHealth[i][j] / (15 / 5))) - 1);
+          int soilColor = (int) (j / 4);
+          int soilAlpha = (int) (min(5, ceil((float)soilHealth[i][j] / (15 / 5))) - 1);
 
-					image(soils[soilColor][soilAlpha], i * SOIL_SIZE, j * SOIL_SIZE);
+          image(soils[soilColor][soilAlpha], i * SOIL_SIZE, j * SOIL_SIZE);
 
-					if(soilHealth[i][j] > 15){
-						int stoneSize = (int) (min(5, ceil(((float)soilHealth[i][j] - 15) / (15 / 5))) - 1);
-						image(stones[0][stoneSize], i * SOIL_SIZE, j * SOIL_SIZE);
-					}
+          if(soilHealth[i][j] > 15){
+            int stoneSize = (int) (min(5, ceil(((float)soilHealth[i][j] - 15) / (15 / 5))) - 1);
+            image(stones[0][stoneSize], i * SOIL_SIZE, j * SOIL_SIZE);
+          }
 
-					if(soilHealth[i][j] > 15 * 2){
-						int stoneSize = (int) (min(5, ceil(((float)soilHealth[i][j] - 15 * 2) / (15 / 5))) - 1);
-						image(stones[1][stoneSize], i * SOIL_SIZE, j * SOIL_SIZE);
-					}
+          if(soilHealth[i][j] > 15 * 2){
+            int stoneSize = (int) (min(5, ceil(((float)soilHealth[i][j] - 15 * 2) / (15 / 5))) - 1);
+            image(stones[1][stoneSize], i * SOIL_SIZE, j * SOIL_SIZE);
+          }
 
-				}else{
-					image(soilEmpty, i * SOIL_SIZE, j * SOIL_SIZE);
-				}
+        }else{
+          image(soilEmpty, i * SOIL_SIZE, j * SOIL_SIZE);
+        }
 
-			}
-		}
+      }
+    }
 
-		// Soil background past layer 24
-		for(int i = 0; i < SOIL_COL_COUNT; i++){
-			for(int j = SOIL_ROW_COUNT; j < SOIL_ROW_COUNT + 4; j++){
-				image(soilEmpty, i * SOIL_SIZE, j * SOIL_SIZE);
-			}
-		}
+    // Soil background past layer 24
+    for(int i = 0; i < SOIL_COL_COUNT; i++){
+      for(int j = SOIL_ROW_COUNT; j < SOIL_ROW_COUNT + 4; j++){
+        image(soilEmpty, i * SOIL_SIZE, j * SOIL_SIZE);
+      }
+    }
 
-		image(sweethome, 0, SOIL_ROW_COUNT * SOIL_SIZE);
+    image(sweethome, 0, SOIL_ROW_COUNT * SOIL_SIZE);
 
-		// Cabbages
+    // Cabbages
 
-		for(int i = 0; i < cabbageX.length; i++){
+    for(int i = 0; i < cabbageX.length; i++){
 
-			image(cabbage, cabbageX[i], cabbageY[i]);
+      image(cabbage, cabbageX[i], cabbageY[i]);
 
-			// Requirement #3: Use boolean isHit(...) to detect collision
-			if(playerHealth < PLAYER_MAX_HEALTH
-			&& cabbageX[i] + SOIL_SIZE > playerX    // r1 right edge past r2 left
-		    && cabbageX[i] < playerX + SOIL_SIZE    // r1 left edge past r2 right
-		    && cabbageY[i] + SOIL_SIZE > playerY    // r1 top edge past r2 bottom
-		    && cabbageY[i] < playerY + SOIL_SIZE) { // r1 bottom edge past r2 top
+      // Requirement #3: Use boolean isHit(...) to detect collision
+      if(playerHealth < PLAYER_MAX_HEALTH
+      && isHit(playerX, playerY, SOIL_SIZE, SOIL_SIZE, cabbageX[i], cabbageY[i], SOIL_SIZE, SOIL_SIZE)) { 
 
-				playerHealth ++;
-				cabbageX[i] = cabbageY[i] = -1000;
+        playerHealth ++;
+        cabbageX[i] = cabbageY[i] = -1000;
 
-			}
+      }
 
-		}
+    }
 
-		// Requirement #1: Clocks
-		// --- Requirement #3: Use boolean isHit(...) to detect clock <-> player collision
+    // Requirement #1: Clocks
+    // --- Requirement #3: Use boolean isHit(...) to detect clock <-> player collision
+    for(int i = 0; i < clockX.length; i++){
+      
+      image(clock, clockX[i], clockY[i]);
+      
+      if(isHit(playerX, playerY, SOIL_SIZE, SOIL_SIZE, clockX[i], clockY[i], SOIL_SIZE, SOIL_SIZE)){
+        clockX[i] = clockY[i] = -1000;
+        addTime(CLOCK_BONUS_SECONDS);
+      }
+    }
 
-		// Groundhog
+    // Groundhog
 
-		PImage groundhogDisplay = groundhogIdle;
+    PImage groundhogDisplay = groundhogIdle;
 
-		// If player is not moving, we have to decide what player has to do next
-		if(playerMoveTimer == 0){
+    // If player is not moving, we have to decide what player has to do next
+    if(playerMoveTimer == 0){
+
+      if((playerRow + 1 < SOIL_ROW_COUNT && soilHealth[playerCol][playerRow + 1] == 0) || playerRow + 1 >= SOIL_ROW_COUNT){
 
-			if((playerRow + 1 < SOIL_ROW_COUNT && soilHealth[playerCol][playerRow + 1] == 0) || playerRow + 1 >= SOIL_ROW_COUNT){
+        groundhogDisplay = groundhogDown;
+        playerMoveDirection = DOWN;
+        playerMoveTimer = playerMoveDuration;
 
-				groundhogDisplay = groundhogDown;
-				playerMoveDirection = DOWN;
-				playerMoveTimer = playerMoveDuration;
+      }else{
 
-			}else{
+        if(leftState){
 
-				if(leftState){
+          groundhogDisplay = groundhogLeft;
 
-					groundhogDisplay = groundhogLeft;
+          // Check left boundary
+          if(playerCol > 0){
 
-					// Check left boundary
-					if(playerCol > 0){
+            if(playerRow >= 0 && soilHealth[playerCol - 1][playerRow] > 0){
+              soilHealth[playerCol - 1][playerRow] --;
+            }else{
+              playerMoveDirection = LEFT;
+              playerMoveTimer = playerMoveDuration;
+            }
 
-						if(playerRow >= 0 && soilHealth[playerCol - 1][playerRow] > 0){
-							soilHealth[playerCol - 1][playerRow] --;
-						}else{
-							playerMoveDirection = LEFT;
-							playerMoveTimer = playerMoveDuration;
-						}
+          }
 
-					}
+        }else if(rightState){
 
-				}else if(rightState){
+          groundhogDisplay = groundhogRight;
 
-					groundhogDisplay = groundhogRight;
+          // Check right boundary
+          if(playerCol < SOIL_COL_COUNT - 1){
 
-					// Check right boundary
-					if(playerCol < SOIL_COL_COUNT - 1){
+            if(playerRow >= 0 && soilHealth[playerCol + 1][playerRow] > 0){
+              soilHealth[playerCol + 1][playerRow] --;
+            }else{
+              playerMoveDirection = RIGHT;
+              playerMoveTimer = playerMoveDuration;
+            }
 
-						if(playerRow >= 0 && soilHealth[playerCol + 1][playerRow] > 0){
-							soilHealth[playerCol + 1][playerRow] --;
-						}else{
-							playerMoveDirection = RIGHT;
-							playerMoveTimer = playerMoveDuration;
-						}
+          }
 
-					}
+        }else if(downState){
 
-				}else if(downState){
+          groundhogDisplay = groundhogDown;
 
-					groundhogDisplay = groundhogDown;
+          // Check bottom boundary
+          if(playerRow < SOIL_ROW_COUNT - 1){
 
-					// Check bottom boundary
-					if(playerRow < SOIL_ROW_COUNT - 1){
+            soilHealth[playerCol][playerRow + 1] --;
 
-						soilHealth[playerCol][playerRow + 1] --;
+          }
+        }
+      }
 
-					}
-				}
-			}
+    }else{
+      // Draw image before moving to prevent offset
+      switch(playerMoveDirection){
+        case LEFT:  groundhogDisplay = groundhogLeft;  break;
+        case RIGHT:  groundhogDisplay = groundhogRight;  break;
+        case DOWN:  groundhogDisplay = groundhogDown;  break;
+      }
+    }
 
-		}else{
-			// Draw image before moving to prevent offset
-			switch(playerMoveDirection){
-				case LEFT:	groundhogDisplay = groundhogLeft;	break;
-				case RIGHT:	groundhogDisplay = groundhogRight;	break;
-				case DOWN:	groundhogDisplay = groundhogDown;	break;
-			}
-		}
+    image(groundhogDisplay, playerX, playerY);
 
-		image(groundhogDisplay, playerX, playerY);
+    // If player is now moving?
 
-		// If player is now moving?
+    if(playerMoveTimer > 0){
 
-		if(playerMoveTimer > 0){
+      playerMoveTimer --;
+      switch(playerMoveDirection){
 
-			playerMoveTimer --;
-			switch(playerMoveDirection){
+        case LEFT:
+        if(playerMoveTimer == 0){
+          playerCol--;
+          playerX = SOIL_SIZE * playerCol;
+        }else{
+          playerX = (float(playerMoveTimer) / playerMoveDuration + playerCol - 1) * SOIL_SIZE;
+        }
+        break;
 
-				case LEFT:
-				if(playerMoveTimer == 0){
-					playerCol--;
-					playerX = SOIL_SIZE * playerCol;
-				}else{
-					playerX = (float(playerMoveTimer) / playerMoveDuration + playerCol - 1) * SOIL_SIZE;
-				}
-				break;
+        case RIGHT:
+        if(playerMoveTimer == 0){
+          playerCol++;
+          playerX = SOIL_SIZE * playerCol;
+        }else{
+          playerX = (1f - float(playerMoveTimer) / playerMoveDuration + playerCol) * SOIL_SIZE;
+        }
+        break;
 
-				case RIGHT:
-				if(playerMoveTimer == 0){
-					playerCol++;
-					playerX = SOIL_SIZE * playerCol;
-				}else{
-					playerX = (1f - float(playerMoveTimer) / playerMoveDuration + playerCol) * SOIL_SIZE;
-				}
-				break;
+        case DOWN:
+        if(playerMoveTimer == 0){
+          playerRow++;
+          playerY = SOIL_SIZE * playerRow;
+          if(playerRow >= SOIL_ROW_COUNT + 3) gameState = GAME_WIN;
+        }else{
+          playerY = (1f - float(playerMoveTimer) / playerMoveDuration + playerRow) * SOIL_SIZE;
+        }
+        break;
+      }
 
-				case DOWN:
-				if(playerMoveTimer == 0){
-					playerRow++;
-					playerY = SOIL_SIZE * playerRow;
-					if(playerRow >= SOIL_ROW_COUNT + 3) gameState = GAME_WIN;
-				}else{
-					playerY = (1f - float(playerMoveTimer) / playerMoveDuration + playerRow) * SOIL_SIZE;
-				}
-				break;
-			}
+    }
 
-		}
+    // Soldiers
 
-		// Soldiers
+    for(int i = 0; i < soldierX.length; i++){
 
-		for(int i = 0; i < soldierX.length; i++){
+      soldierX[i] += soldierSpeed;
+      if(soldierX[i] >= width) soldierX[i] = -SOIL_SIZE;
 
-			soldierX[i] += soldierSpeed;
-			if(soldierX[i] >= width) soldierX[i] = -SOIL_SIZE;
+      image(soldier, soldierX[i], soldierY[i]);
 
-			image(soldier, soldierX[i], soldierY[i]);
+      // Requirement #3: Use boolean isHit(...) to detect collision
+      if(isHit(playerX, playerY, SOIL_SIZE, SOIL_SIZE, soldierX[i], soldierY[i], SOIL_SIZE, SOIL_SIZE)) { 
 
-			// Requirement #3: Use boolean isHit(...) to detect collision
-			if(soldierX[i] + SOIL_SIZE > playerX    // r1 right edge past r2 left
-		    && soldierX[i] < playerX + SOIL_SIZE    // r1 left edge past r2 right
-		    && soldierY[i] + SOIL_SIZE > playerY    // r1 top edge past r2 bottom
-		    && soldierY[i] < playerY + SOIL_SIZE) { // r1 bottom edge past r2 top
+        playerHealth --;
 
-				playerHealth --;
+        if(playerHealth == 0){
 
-				if(playerHealth == 0){
+          gameState = GAME_OVER;
 
-					gameState = GAME_OVER;
+        }else{
 
-				}else{
+          playerX = PLAYER_INIT_X;
+          playerY = PLAYER_INIT_Y;
+          playerCol = (int) playerX / SOIL_SIZE;
+          playerRow = (int) playerY / SOIL_SIZE;
+          soilHealth[playerCol][playerRow + 1] = 15;
+          playerMoveTimer = 0;
 
-					playerX = PLAYER_INIT_X;
-					playerY = PLAYER_INIT_Y;
-					playerCol = (int) playerX / SOIL_SIZE;
-					playerRow = (int) playerY / SOIL_SIZE;
-					soilHealth[playerCol][playerRow + 1] = 15;
-					playerMoveTimer = 0;
+        }
 
-				}
+      }
+    }
 
-			}
-		}
+    // Requirement #6:
+    //   Call drawCaution() to draw caution sign
 
-		// Requirement #6:
-		//   Call drawCaution() to draw caution sign
+    popMatrix();
 
-		popMatrix();
+    // Depth UI
+    drawDepthUI();
 
-		// Depth UI
-		drawDepthUI();
+    // Timer
+    gameTimer --;
+    if(gameTimer <= 0) gameState = GAME_OVER;
 
-		// Timer
-		gameTimer --;
-		if(gameTimer <= 0) gameState = GAME_OVER;
+    // Time UI - Requirement #4
+    drawTimerUI();
 
-		// Time UI - Requirement #4
-		drawTimerUI();
+    // Health UI
+    for(int i = 0; i < playerHealth; i++){
+      image(life, 10 + i * 70, 10);
+    }
 
-		// Health UI
-		for(int i = 0; i < playerHealth; i++){
-			image(life, 10 + i * 70, 10);
-		}
+    break;
 
-		break;
+    case GAME_OVER: // Gameover Screen
+    image(gameover, 0, 0);
+    
+    if(START_BUTTON_X + START_BUTTON_WIDTH > mouseX
+      && START_BUTTON_X < mouseX
+      && START_BUTTON_Y + START_BUTTON_HEIGHT > mouseY
+      && START_BUTTON_Y < mouseY) {
 
-		case GAME_OVER: // Gameover Screen
-		image(gameover, 0, 0);
-		
-		if(START_BUTTON_X + START_BUTTON_WIDTH > mouseX
-	    && START_BUTTON_X < mouseX
-	    && START_BUTTON_Y + START_BUTTON_HEIGHT > mouseY
-	    && START_BUTTON_Y < mouseY) {
+      image(restartHovered, START_BUTTON_X, START_BUTTON_Y);
+      if(mousePressed){
+        gameState = GAME_RUN;
+        mousePressed = false;
+        initGame();
+      }
 
-			image(restartHovered, START_BUTTON_X, START_BUTTON_Y);
-			if(mousePressed){
-				gameState = GAME_RUN;
-				mousePressed = false;
-				initGame();
-			}
+    }else{
 
-		}else{
+      image(restartNormal, START_BUTTON_X, START_BUTTON_Y);
 
-			image(restartNormal, START_BUTTON_X, START_BUTTON_Y);
+    }
+    break;
 
-		}
-		break;
+    case GAME_WIN: // Gameover Screen
+    image(gamewin, 0, 0);
+    
+    if(START_BUTTON_X + START_BUTTON_WIDTH > mouseX
+      && START_BUTTON_X < mouseX
+      && START_BUTTON_Y + START_BUTTON_HEIGHT > mouseY
+      && START_BUTTON_Y < mouseY) {
 
-		case GAME_WIN: // Gameover Screen
-		image(gamewin, 0, 0);
-		
-		if(START_BUTTON_X + START_BUTTON_WIDTH > mouseX
-	    && START_BUTTON_X < mouseX
-	    && START_BUTTON_Y + START_BUTTON_HEIGHT > mouseY
-	    && START_BUTTON_Y < mouseY) {
+      image(restartHovered, START_BUTTON_X, START_BUTTON_Y);
+      if(mousePressed){
+        gameState = GAME_RUN;
+        mousePressed = false;
+        initGame();
+      }
 
-			image(restartHovered, START_BUTTON_X, START_BUTTON_Y);
-			if(mousePressed){
-				gameState = GAME_RUN;
-				mousePressed = false;
-				initGame();
-			}
+    }else{
 
-		}else{
+      image(restartNormal, START_BUTTON_X, START_BUTTON_Y);
 
-			image(restartNormal, START_BUTTON_X, START_BUTTON_Y);
-
-		}
-		break;
-		
-	}
+    }
+    break;
+    
+  }
 }
 
 void drawDepthUI(){
-	String depthString = (playerRow + 1) + "m";
-	textSize(56);
-	textAlign(RIGHT, BOTTOM);
-	fill(0, 120);
-	text(depthString, width + 3, height + 3);
-	fill(#ffcc00);
-	text(depthString, width, height);
+  String depthString = (playerRow + 1) + "m";
+  textSize(56);
+  textAlign(RIGHT, BOTTOM);
+  fill(0, 120);
+  text(depthString, width + 3, height + 3);
+  fill(#ffcc00);
+  text(depthString, width, height);
 }
 
 void drawTimerUI(){
-	String timeString = str(gameTimer); // Requirement #4: Get the mm:ss string using String convertFramesToTimeString(int frames)
+  String timeString = convertFramesToTimeString(gameTimer);
+  // String timeString = str(gameTimer); // Requirement #4: Get the mm:ss string using String convertFramesToTimeString(int frames)
 
-	textAlign(LEFT, BOTTOM);
+  textAlign(LEFT, BOTTOM);
 
-	// Time Text Shadow Effect - You don't have to change this!
-	fill(0, 120);
-	text(timeString, 3, height + 3);
+  // Time Text Shadow Effect - You don't have to change this!
+  fill(0, 120);
+  text(timeString, 3, height + 3);
 
-	// Actual Time Text
-	color timeTextColor = #ffffff; 		// Requirement #5: Get the correct color using color getTimeTextColor(int frames)
-	fill(timeTextColor);
-	text(timeString, 0, height);
+  // Actual Time Text
+  color timeTextColor = getTimeTextColor(gameTimer);     // Requirement #5: Get the correct color using color getTimeTextColor(int frames)
+  fill(timeTextColor);
+  text(timeString, 0, height);
 }
 
-void addTime(float seconds){					// Requirement #2
+void addTime(float seconds){  // Requirement #2
+  gameTimer += seconds * 4 * 15;
+  
 }
 
 boolean isHit(float ax, float ay, float aw, float ah, float bx, float by, float bw, float bh){
-	return false;								// Requirement #3
+  if(ax+aw > bx && ax < bx+bw && ay+ah > by && ay < by+bh){
+     return true;
+  }
+  return false;                // Requirement #3
 }
 
-String convertFramesToTimeString(int frames){	// Requirement #4
-	return "";
+String convertFramesToTimeString(int frames){  // Requirement #4
+  int seconds = floor(frames/60);
+  int m = floor(seconds/60);
+  int s = seconds - 60*m;
+  String min = nf(m,2);
+  String sec = nf(s,2);
+  
+  return min + ":" + sec;
 }
 
-color getTimeTextColor(int frames){				// Requirement #5
-	return #ffffff;
+color getTimeTextColor(int frames){        // Requirement #5
+  if(frames >= 7200)  return #00ffff;
+  if(3600 <= frames && frames < 7200) return #ffffff;
+  if(1800 <= frames && frames < 3600) return #ffcc00;
+  if(600 <= frames && frames < 1800) return #ff6600;
+  if(frames < 600) return #ff0000;
+  
 }
 
-int getEnemyIndexByRow(int row){				// Requirement #6
+int getEnemyIndexByRow(int row){        // Requirement #6
 
-		// HINT:
-		// - If there's a soldier in that row, return that soldier's index in soldierX/soldierY
-		// (for example, if soldierY[3] is in that row, return 3)
-		// - Return -1 if there's no soldier in that row
+    // HINT:
+    // - If there's a soldier in that row, return that soldier's index in soldierX/soldierY
+    // (for example, if soldierY[3] is in that row, return 3)
+    // - Return -1 if there's no soldier in that row
 
-	return -1;
+  return -1;
 }
 
-void drawCaution(){								// Requirement #6
+void drawCaution(){                // Requirement #6
 
-	// Draw a caution sign above the enemy under the screen using int getEnemyIndexByRow(int row)
+  // Draw a caution sign above the enemy under the screen using int getEnemyIndexByRow(int row)
 
-		// HINT:
-		// - Use playerRow to calculate the row below the screen
-		// - Use the returned value from int getEnemyIndexByRow(int row) to get the soldier's position from soldierX/soldierY arrays
-		// - Don't draw anything if int getEnemyIndexByRow(int row) returns -1
+    // HINT:
+    // - Use playerRow to calculate the row below the screen
+    // - Use the returned value from int getEnemyIndexByRow(int row) to get the soldier's position from soldierX/soldierY arrays
+    // - Don't draw anything if int getEnemyIndexByRow(int row) returns -1
 }
 
 void keyPressed(){
-	if(key==CODED){
-		switch(keyCode){
-			case LEFT:
-			leftState = true;
-			break;
-			case RIGHT:
-			rightState = true;
-			break;
-			case DOWN:
-			downState = true;
-			break;
-		}
-	}else{
-		if(key=='t'){
-			gameTimer -= 180;
-		}
-	}
+  if(key==CODED){
+    switch(keyCode){
+      case LEFT:
+      leftState = true;
+      break;
+      case RIGHT:
+      rightState = true;
+      break;
+      case DOWN:
+      downState = true;
+      break;
+    }
+  }else{
+    if(key=='t'){
+      gameTimer -= 180;
+    }
+  }
 }
 
 void keyReleased(){
-	if(key==CODED){
-		switch(keyCode){
-			case LEFT:
-			leftState = false;
-			break;
-			case RIGHT:
-			rightState = false;
-			break;
-			case DOWN:
-			downState = false;
-			break;
-		}
-	}
+  if(key==CODED){
+    switch(keyCode){
+      case LEFT:
+      leftState = false;
+      break;
+      case RIGHT:
+      rightState = false;
+      break;
+      case DOWN:
+      downState = false;
+      break;
+    }
+  }
 }
