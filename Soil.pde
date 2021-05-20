@@ -1,8 +1,11 @@
 class Soil{
   // Properties
-  final int SOIL_COL_COUNT = 8;
-  final int SOIL_ROW_COUNT = 24;
   
+  /*
+  SOIL_COL_COUNT = 8;
+  SOIL_ROW_COUNT = 24;
+  SOIL_SIZE = 80;
+  */
   
   int[][] soilHealth;
   

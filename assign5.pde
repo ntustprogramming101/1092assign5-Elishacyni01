@@ -1,7 +1,7 @@
 PImage title, gameover, gamewin, startNormal, startHovered, restartNormal, restartHovered;
 PImage groundhogIdle, groundhogLeft, groundhogRight, groundhogDown;
-PImage bg, life, cabbage, soilEmpty, clock, caution, sweethome;
-PImage soldier;
+PImage bg, life, cabbageImg, soilEmpty, clock, caution, sweethome;
+PImage soldierImg;
 PImage[][] soils, stones;
 PFont font;
 
@@ -9,6 +9,8 @@ final int GAME_START = 0, GAME_RUN = 1, GAME_OVER = 2, GAME_WIN = 3;
 int gameState = 0;
 
 final int GRASS_HEIGHT = 15;
+final int SOIL_COL_COUNT = 8;
+final int SOIL_ROW_COUNT = 24;
 final int SOIL_SIZE = 80;
 
 final int START_BUTTON_WIDTH = 144;
@@ -16,13 +18,10 @@ final int START_BUTTON_HEIGHT = 60;
 final int START_BUTTON_X = 248;
 final int START_BUTTON_Y = 360;
 
-float[] cabbageX, cabbageY, soldierX, soldierY, clockX, clockY;
-float soldierSpeed = 2f;
 
-final int GAME_INIT_TIMER = 7200;
-int gameTimer = GAME_INIT_TIMER;
 
-final float CLOCK_BONUS_SECONDS = 15f;
+
+
 
 
 
@@ -30,6 +29,8 @@ boolean demoMode = false;
 
 Soil soil;
 Stone stone;
+Player player;
+Soldier soldiers;
 
 void setup() {
 	size(640, 480, P2D);
@@ -47,8 +48,8 @@ void setup() {
 	groundhogRight = loadImage("img/groundhogRight.png");
 	groundhogDown = loadImage("img/groundhogDown.png");
 	life = loadImage("img/life.png");
-	soldier = loadImage("img/soldier.png");
-	cabbage = loadImage("img/cabbage.png");
+	soldierImg = loadImage("img/soldier.png");
+	cabbageImg = loadImage("img/cabbage.png");
 	clock = loadImage("img/clock.png");
 	caution = loadImage("img/caution.png");
 	sweethome = loadImage("img/sweethome.png");
@@ -74,13 +75,13 @@ void initGame(){
 	gameTimer = GAME_INIT_TIMER;
 
 	// Initialize player
-	initPlayer();
+	player.initPlayer();
 
 	// Initialize soilHealth
 	soil.initSoils();
 
 	// Initialize soidiers and their position
-	initSoldiers();
+	soldiers.initSoldiers();
 
 	// Initialize cabbages and their position
 	initCabbages();
@@ -93,25 +94,9 @@ void initGame(){
 
 
 
-void initSoldiers(){
-	soldierX = new float[6];
-	soldierY = new float[6];
 
-	for(int i = 0; i < soldierX.length; i++){
-		soldierX[i] = random(-SOIL_SIZE, width);
-		soldierY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
-	}
-}
 
-void initCabbages(){
-	cabbageX = new float[6];
-	cabbageY = new float[6];
 
-	for(int i = 0; i < cabbageX.length; i++){
-		cabbageX[i] = SOIL_SIZE * floor(random(SOIL_COL_COUNT));
-		cabbageY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
-	}
-}
 
 void initClocks(){
 	// Requirement #1: Complete this method based on initCabbages()
@@ -174,7 +159,7 @@ void draw() {
 
 		for(int i = 0; i < cabbageX.length; i++){
 
-			image(cabbage, cabbageX[i], cabbageY[i]);
+			image(cabbageImg, cabbageX[i], cabbageY[i]);
 
 			// Requirement #3: Use boolean isHit(...) to detect collision
 			if(playerHealth < PLAYER_MAX_HEALTH
@@ -195,112 +180,7 @@ void draw() {
 
 		// Groundhog
 
-		PImage groundhogDisplay = groundhogIdle;
-
-		// If player is not moving, we have to decide what player has to do next
-		if(playerMoveTimer == 0){
-
-			if((playerRow + 1 < SOIL_ROW_COUNT && soilHealth[playerCol][playerRow + 1] == 0) || playerRow + 1 >= SOIL_ROW_COUNT){
-
-				groundhogDisplay = groundhogDown;
-				playerMoveDirection = DOWN;
-				playerMoveTimer = playerMoveDuration;
-
-			}else{
-
-				if(leftState){
-
-					groundhogDisplay = groundhogLeft;
-
-					// Check left boundary
-					if(playerCol > 0){
-
-						if(playerRow >= 0 && soilHealth[playerCol - 1][playerRow] > 0){
-							soilHealth[playerCol - 1][playerRow] --;
-						}else{
-							playerMoveDirection = LEFT;
-							playerMoveTimer = playerMoveDuration;
-						}
-
-					}
-
-				}else if(rightState){
-
-					groundhogDisplay = groundhogRight;
-
-					// Check right boundary
-					if(playerCol < SOIL_COL_COUNT - 1){
-
-						if(playerRow >= 0 && soilHealth[playerCol + 1][playerRow] > 0){
-							soilHealth[playerCol + 1][playerRow] --;
-						}else{
-							playerMoveDirection = RIGHT;
-							playerMoveTimer = playerMoveDuration;
-						}
-
-					}
-
-				}else if(downState){
-
-					groundhogDisplay = groundhogDown;
-
-					// Check bottom boundary
-					if(playerRow < SOIL_ROW_COUNT - 1){
-
-						soilHealth[playerCol][playerRow + 1] --;
-
-					}
-				}
-			}
-
-		}else{
-			// Draw image before moving to prevent offset
-			switch(playerMoveDirection){
-				case LEFT:	groundhogDisplay = groundhogLeft;	break;
-				case RIGHT:	groundhogDisplay = groundhogRight;	break;
-				case DOWN:	groundhogDisplay = groundhogDown;	break;
-			}
-		}
-
-		image(groundhogDisplay, playerX, playerY);
-
-		// If player is now moving?
-
-		if(playerMoveTimer > 0){
-
-			playerMoveTimer --;
-			switch(playerMoveDirection){
-
-				case LEFT:
-				if(playerMoveTimer == 0){
-					playerCol--;
-					playerX = SOIL_SIZE * playerCol;
-				}else{
-					playerX = (float(playerMoveTimer) / playerMoveDuration + playerCol - 1) * SOIL_SIZE;
-				}
-				break;
-
-				case RIGHT:
-				if(playerMoveTimer == 0){
-					playerCol++;
-					playerX = SOIL_SIZE * playerCol;
-				}else{
-					playerX = (1f - float(playerMoveTimer) / playerMoveDuration + playerCol) * SOIL_SIZE;
-				}
-				break;
-
-				case DOWN:
-				if(playerMoveTimer == 0){
-					playerRow++;
-					playerY = SOIL_SIZE * playerRow;
-					if(playerRow >= SOIL_ROW_COUNT + 3) gameState = GAME_WIN;
-				}else{
-					playerY = (1f - float(playerMoveTimer) / playerMoveDuration + playerRow) * SOIL_SIZE;
-				}
-				break;
-			}
-
-		}
+		
 
 		// Soldiers
 
@@ -309,7 +189,7 @@ void draw() {
 			soldierX[i] += soldierSpeed;
 			if(soldierX[i] >= width) soldierX[i] = -SOIL_SIZE;
 
-			image(soldier, soldierX[i], soldierY[i]);
+			image(soldierImg, soldierX[i], soldierY[i]);
 
 			// Requirement #3: Use boolean isHit(...) to detect collision
 			if(soldierX[i] + SOIL_SIZE > playerX    // r1 right edge past r2 left
@@ -403,43 +283,5 @@ void draw() {
 		}
 		break;
 		
-	}
-}
-
-
-
-void keyPressed(){
-	if(key==CODED){
-		switch(keyCode){
-			case LEFT:
-			leftState = true;
-			break;
-			case RIGHT:
-			rightState = true;
-			break;
-			case DOWN:
-			downState = true;
-			break;
-		}
-	}else{
-		if(key=='t'){
-			gameTimer -= 180;
-		}
-	}
-}
-
-void keyReleased(){
-	if(key==CODED){
-		switch(keyCode){
-			case LEFT:
-			leftState = false;
-			break;
-			case RIGHT:
-			rightState = false;
-			break;
-			case DOWN:
-			downState = false;
-			break;
-		}
 	}
 }
