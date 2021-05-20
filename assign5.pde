@@ -106,7 +106,7 @@ void initGame(){
   initCabbages();
 
   // Requirement #2: Initialize clocks and their position
-
+  initClocks();
 }
 
 void initPlayer(){
@@ -304,10 +304,7 @@ void draw() {
 
       // Requirement #3: Use boolean isHit(...) to detect collision
       if(playerHealth < PLAYER_MAX_HEALTH
-      && cabbageX[i] + SOIL_SIZE > playerX    // r1 right edge past r2 left
-        && cabbageX[i] < playerX + SOIL_SIZE    // r1 left edge past r2 right
-        && cabbageY[i] + SOIL_SIZE > playerY    // r1 top edge past r2 bottom
-        && cabbageY[i] < playerY + SOIL_SIZE) { // r1 bottom edge past r2 top
+      && isHit(playerX, playerY, SOIL_SIZE, SOIL_SIZE, cabbageX[i], cabbageY[i], SOIL_SIZE, SOIL_SIZE)) { 
 
         playerHealth ++;
         cabbageX[i] = cabbageY[i] = -1000;
@@ -318,6 +315,15 @@ void draw() {
 
     // Requirement #1: Clocks
     // --- Requirement #3: Use boolean isHit(...) to detect clock <-> player collision
+    for(int i = 0; i < clockX.length; i++){
+      
+      image(clock, clockX[i], clockY[i]);
+      
+      if(isHit(playerX, playerY, SOIL_SIZE, SOIL_SIZE, clockX[i], clockY[i], SOIL_SIZE, SOIL_SIZE)){
+        clockX[i] = clockY[i] = -1000;
+        addTime(CLOCK_BONUS_SECONDS);
+      }
+    }
 
     // Groundhog
 
@@ -557,10 +563,15 @@ void drawTimerUI(){
   text(timeString, 0, height);
 }
 
-void addTime(float seconds){          // Requirement #2
+void addTime(float seconds){  // Requirement #2
+  gameTimer += CLOCK_BONUS_SECONDS*4*15;
+  
 }
 
 boolean isHit(float ax, float ay, float aw, float ah, float bx, float by, float bw, float bh){
+  if(ax+aw > bx && ax < bx+bw && ay+ah > by && ay < by+bh){
+     return true;
+  }
   return false;                // Requirement #3
 }
 
