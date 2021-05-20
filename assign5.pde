@@ -444,10 +444,7 @@ void draw() {
       image(soldier, soldierX[i], soldierY[i]);
 
       // Requirement #3: Use boolean isHit(...) to detect collision
-      if(soldierX[i] + SOIL_SIZE > playerX    // r1 right edge past r2 left
-        && soldierX[i] < playerX + SOIL_SIZE    // r1 left edge past r2 right
-        && soldierY[i] + SOIL_SIZE > playerY    // r1 top edge past r2 bottom
-        && soldierY[i] < playerY + SOIL_SIZE) { // r1 bottom edge past r2 top
+      if(isHit(playerX, playerY, SOIL_SIZE, SOIL_SIZE, soldierX[i], soldierY[i], SOIL_SIZE, SOIL_SIZE)) { 
 
         playerHealth --;
 
